@@ -1,0 +1,108 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+  <!ENTITY name      "prometheus_fritzbox_exporter">
+  <!ENTITY author    "ich777">
+  <!ENTITY version   "2021.09.21">
+  <!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unraid-&name;/master">
+  <!ENTITY pluginURL "&gitURL;/&name;.plg">
+  <!ENTITY md5       "cdc6a3ee4fa6a5335e7d3660fbdf1c42">
+  <!ENTITY plugin    "/boot/config/plugins/&name;">
+  <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/">
+
+<CHANGES>
+
+###2021.09.21
+- Initial release
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz" Run="upgradepkg --install-new">
+<URL>&gitURL;/packages/&name;-&version;.tgz</URL>
+<MD5>&md5;</MD5>
+</FILE>
+
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**Prometheus Fritzbox Exporter**
+
+Is a slim plugin, that takes informations gathered from your Fritzbox and provides it to a Prometheus database. Usage is not limited to Prometheus only. Data can be formated and displayed to any database or graphical node.  
+Export URL: The URL for the exportet metrics is: 'http://YOURunRAIDIP:9042/metrics' (to use it in Prometheus add the target: 'YOURunRAIDIP:9042' to your Prometheus yaml).  
+This Plugin is based on: https://github.com/sberk42/fritzbox_exporter
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+
+#Create settings file if not found
+if [ ! -f "&plugin;/settings.cfg" ]; then
+  echo 'fritz_username=
+fritz_password=
+fritz_additional=
+exporter_address=0.0.0.0:9042
+exporter_metrics_file=metrics.json
+exporter_luametrics_file=metrics-lua.json' > "&plugin;/settings.cfg"
+fi
+
+#Copy metric files and delete them
+if [ ! -f "&plugin;/metrics.json" ]; then
+  cp /tmp/prom_fritz/metrics.json &plugin;/metrics.json
+fi
+if [ ! -f "&plugin;/metrics-lua.json" ]; then
+  cp /tmp/metrics-lua.json &plugin;/metrics-lua.json
+fi
+rm -rf /tmp/prom_fritz
+
+echo
+if [ -z "$(pidof prometheus_fritzbox_exporter)" ]; then
+  FRITZ_USER="$(cat &plugin;/settings.cfg | grep "fritz_username=" | cut -d '=' -f2-)"
+  if [ ! -z "${FRITZ_USER}" ]; then
+    FRITZ_PASSWD="$(cat &plugin;/settings.cfg | grep "fritz_password=" | cut -d '=' -f2-)"
+    FRITZ_ADD="$(cat &plugin;/settings.cfg | grep "fritz_additional=" | cut -d '=' -f2-)"
+    EXP_ADDRESS="$(cat &plugin;/settings.cfg | grep "exporter_address=" | cut -d '=' -f2-)"
+    EXP_METRICS="$(cat &plugin;/settings.cfg | grep "exporter_metrics_file=" | cut -d '=' -f2-)"
+    EXP_LUAMETRICS="$(cat &plugin;/settings.cfg | grep "exporter_luametrics_file=" | cut -d '=' -f2-)"
+    #Starting Prometheus Fritzbox Exporter Daemon
+    echo
+    echo "-------------Starting Prometheus Fritzbox Exporter!--------------"
+    echo "/usr/bin/prometheus_fritzbox_exporter -listen-address="${EXP_ADDRESS}" -username="${FRITZ_USER}" -password="${FRITZ_PASSWD}" -metrics-file="&plugin;/${EXP_METRICS}" -lua-metrics-file="&plugin;/${EXP_LUAMETRICS} ${FRITZ_ADD}" 2>/dev/null" | at now
+  else
+    echo "---Please enter your connection details for your Fritzbox on the plugin configuration page!---"
+  fi
+else
+  echo "---Nothing to do, prometheus_fritzbox_exporter already started!---"
+  echo
+fi
+
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+
+echo "-----------------------------------------------"
+echo "---Uninstalling prometheus_fritzbox_exporter---"
+echo "-----------------------------------------------"
+# Remove plugin related files
+kill $(pidof prometheus_fritzbox_exporter) 2>/dev/null
+removepkg &name;-&version;
+rm -rf /usr/local/emhttp/plugins/&name;
+rm -rf &plugin;
+echo
+echo "--------------------------------------------------------------"
+echo "---Uninstallation of prometheus_fritzbox_exporter complete!---"
+echo "--------------------------------------------------------------"
+echo
+
+</INLINE>
+</FILE>
+</PLUGIN>
