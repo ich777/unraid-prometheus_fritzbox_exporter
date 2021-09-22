@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "prometheus_fritzbox_exporter">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2021.09.21">
+  <!ENTITY version   "2021.09.22">
   <!ENTITY launch    "Settings/fritzbox_exporter">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unraid-&name;/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "cdc6a3ee4fa6a5335e7d3660fbdf1c42">
+  <!ENTITY md5       "2b5942ffeda73198ccaa7dbbb8ec1ce3">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -15,7 +15,7 @@
 
 <CHANGES>
 
-###2021.09.21
+###2021.09.22
 - Initial release
 
 </CHANGES>
