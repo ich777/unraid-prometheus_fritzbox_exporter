@@ -1,0 +1,175 @@
+Menu="Utilities"
+Title="Fritzbox Exporter"
+Icon="prometheus_fritzbox_exporter.png"
+---
+<?php
+//Get selected driver version
+$fritz_username = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_fritzbox_username");
+$fritz_password = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_fritzbox_password");
+$fritz_additional = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_fritzbox_additional");
+$exporter_address = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_exporter_address");
+$exporter_metrics = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_exporter_metrics");
+$exporter_luametrics = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_exporter_luametrics");
+$status = shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh get_status");
+?>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<script>
+//Disable submit button if no radio button is selected
+$(function(){
+    $("input[type='radio']").change(function(){
+
+        $("input[type='submit']").prop("disabled", false);
+        //Or
+        //$("input[type='submit']").removeAttr("disabled");
+    });
+});
+</script>
+<h1 style="text-align: center;"><a target="_blank" rel="noopener"><span style="color: red;">Prometheus Fritzbox Exporter</span></a></h1>
+<p style="text-align: center;">Is a slim plugin, that takes informations gathered from your Fritzbox and provides it to a Prometheus database.<br /><strong>Export URL:</strong> The URL for the exportet metrics is: 'http://YOURunRAIDIP:9042/metrics' (to use it in Prometheus add the target: 'YOURunRAIDIP:9042' to your Prometheus yaml).<br /><em>Usage is not limited to Prometheus only. Data can be formated and displayed to any database or graphical node.</em></p>
+<div style="width: 100%; float:left">
+    <div id="title">
+        <span class="left"></span>
+    </div>
+<?
+if (isset($fritz_username ) === true && trim($fritz_username ) !== ''):
+?>
+<?
+if (isset($status ) === true && trim($status ) === 'running'):
+?>
+<h3 style="text-align: right;">Status: <strong><span style="color: green;">Running</span></strong></h3>
+<form id="STOP" method="post" >
+<input type="submit" name="stopEXPORTER" value="Stop" />
+</form>
+<h3><strong>Current Configuration:</strong></h3><br/>
+<table style="border-collapse: collapse; width: 300px; height: 100px;" border="0">
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Fritzbox Username:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $fritz_username ?></td>
+</tr>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Fritzbox Password:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;">*********</td>
+</tr>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Exporter Address:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $exporter_address ?></td>
+</tr>
+<?
+if (isset($fritz_additional ) === true && trim($fritz_additional ) !== ''):
+?>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Exporter Additional Parameters:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $fritz_additional ?></td>
+<? endif; ?>
+</table>
+<br/>
+<h3><strong>Change current Configuration:</strong></h3>
+<form id="CHANGESTART" method="post" >
+<input type = "text" style="width: 100px;" name = "fritz_username" data-inputmask="mask" placeholder="Username" required>
+<input type = "password" style="width: 100px;" name = "fritz_password" data-inputmask="mask" placeholder="Password" required>
+<input type = "hidden" name = "exporter_address" value=<?php print $exporter_address ?>>
+<input type = "hidden" name = "exporter_metrics" value=<?php print $exporter_metrics ?>>
+<input type = "hidden" name = "exporter_luametrics" value=<?php print $exporter_luametrics ?>>
+<input type = "hidden" name = "fritz_additional" value=<?php print $fritz_additional ?>>
+<input type="submit" name="changeFRITZconfig" value="Change & Start" />
+</form>
+<?
+else :
+?>
+<h3 style="text-align: right;">Status: <strong><span style="color: red;">Stopped</span></strong></h3>
+<form id="s" method="post" >
+<input type = "hidden" name = "fritz_username" value=<?php print $fritz_username ?> >
+<input type = "hidden" name = "fritz_password" value=<?php print $fritz_password ?> >
+<input type = "hidden" name = "exporter_address" value=<?php print $exporter_address ?>>
+<input type = "hidden" name = "exporter_metrics" value=<?php print $exporter_metrics ?>>
+<input type = "hidden" name = "exporter_luametrics" value=<?php print $exporter_luametrics ?>>
+<input type = "hidden" name = "fritz_additional" value=<?php print $fritz_additional ?>>
+<input type="submit" name="startUP" value="Start" />
+</form>
+<h3><strong>Current Configuration:</strong></h3><br/>
+<table style="border-collapse: collapse; width: 300px; height: 100px;" border="0">
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Fritzbox Username:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $fritz_username ?></td>
+</tr>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Fritzbox Password:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;">*********</td>
+</tr>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Exporter Address:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $exporter_address ?></td>
+</tr>
+<?
+if (isset($fritz_additional ) === true && trim($fritz_additional ) !== ''):
+?>
+<tr style="height: 18px;">
+<td style="height: 18px; border-style: hidden; width: 100px;"><strong>Exporter Additional Parameters:</strong></td>
+<td style="width: 50%; height: 18px; border-style: none;"><?php print $fritz_additional ?></td>
+<? endif; ?>
+</table>
+<br/>
+<h3><strong>Change current Configuration:</strong></h3>
+<form id="s" method="post" >
+<input type = "text" style="width: 100px;" name = "fritz_username" data-inputmask="mask" placeholder="Username" required>
+<input type = "password" style="width: 100px;" name = "fritz_password" data-inputmask="mask" placeholder="Password" required>
+<input type = "hidden" name = "exporter_address" value=<?php print $exporter_address ?>>
+<input type = "hidden" name = "exporter_metrics" value=<?php print $exporter_metrics ?>>
+<input type = "hidden" name = "exporter_luametrics" value=<?php print $exporter_luametrics ?>>
+<input type = "hidden" name = "fritz_additional" value=<?php print $fritz_additional ?>>
+<input type="submit" name="changeFRITZconfig" value="Change & Start">
+</form>
+<? endif; ?>
+<? else: ?>
+<h2 style="text-align: center;"><span style="color: red;"><strong>Fritzbox username not set!</strong></span></h2>
+<form id="s" method="post" >
+<input type = "text" style="width: 100px;" name = "fritz_username" data-inputmask="mask" placeholder="Username" required>
+<input type = "password" style="width: 100px;" name = "fritz_password" data-inputmask="mask" placeholder="Password" required>
+<input type = "hidden" name = "exporter_address" value=<?php print $exporter_address ?>>
+<input type = "hidden" name = "exporter_metrics" value=<?php print $exporter_metrics ?>>
+<input type = "hidden" name = "exporter_luametrics" value=<?php print $exporter_luametrics ?>>
+<input type = "hidden" name = "fritz_additional" value=<?php print $fritz_additional ?>>
+<input type="submit" name="changeFRITZconfig" value="Confirm & Start">
+</form>
+<? endif; ?>
+</div>
+
+<?php
+if(isset($_POST['changeFRITZconfig'])) {
+$fritz_username = $_POST["fritz_username"];
+$fritz_password = $_POST["fritz_password"];
+$exporter_address = $_POST["exporter_address"];
+$exporter_metrics = $_POST["exporter_metrics"];
+$exporter_luametrics = $_POST["exporter_luametrics"];
+$fritz_additional = $_POST["fritz_additional"];
+shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh change_fritz_settings ".escapeshellarg($fritz_username)." ".escapeshellarg($fritz_password)." ".escapeshellarg($exporter_address)." ".escapeshellarg($exporter_metrics)." ".escapeshellarg($exporter_luametrics)." ".escapeshellarg($fritz_additional)."");
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
+
+<?php
+if(isset($_POST['startUP'])) {
+$fritz_username = $_POST["fritz_username"];
+$fritz_password = $_POST["fritz_password"];
+$exporter_address = $_POST["exporter_address"];
+$exporter_metrics = $_POST["exporter_metrics"];
+$exporter_luametrics = $_POST["exporter_luametrics"];
+$fritz_additional = $_POST["fritz_additional"];
+shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh change_fritz_settings ".escapeshellarg($fritz_username)." ".escapeshellarg($fritz_password)." ".escapeshellarg($exporter_address)." ".escapeshellarg($exporter_metrics)." ".escapeshellarg($exporter_luametrics)." ".escapeshellarg($fritz_additional)."");
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
+
+<?php
+if(isset($_POST['stopEXPORTER'])) {
+shell_exec("/usr/local/emhttp/plugins/prometheus_fritzbox_exporter/include/exec.sh stop_exporter");
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
