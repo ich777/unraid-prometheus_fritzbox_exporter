@@ -59,7 +59,7 @@ if [ ! -f "&plugin;/metrics.json" ]; then
   cp /tmp/prom_fritz/metrics.json &plugin;/metrics.json
 fi
 if [ ! -f "&plugin;/metrics-lua.json" ]; then
-  cp /tmp/metrics-lua.json &plugin;/metrics-lua.json
+  cp /tmp/prom_fritz/metrics-lua.json &plugin;/metrics-lua.json
 fi
 rm -rf /tmp/prom_fritz
 
