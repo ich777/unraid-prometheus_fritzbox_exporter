@@ -3,6 +3,7 @@
   <!ENTITY name      "prometheus_fritzbox_exporter">
   <!ENTITY author    "ich777">
   <!ENTITY version   "2021.09.21">
+  <!ENTITY launch    "Settings/fritzbox_exporter">
   <!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unraid-&name;/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY md5       "cdc6a3ee4fa6a5335e7d3660fbdf1c42">
@@ -10,7 +11,7 @@
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
 
-<PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/">
+<PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/">
 
 <CHANGES>
 
